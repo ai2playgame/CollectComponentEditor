@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.UIElements;
 using UnityEditor;
 using UnityEditor.UIElements;
+using UnityEngine;
 
 namespace CollectComponentEditor.Editor
 {
@@ -21,6 +23,8 @@ namespace CollectComponentEditor.Editor
 
         private ObjectField _objectField;
         private Label _statLabel;
+
+        private List<VisualElement> _componentViewList = new();
 
         private void CreateGUI()
         {
@@ -45,17 +49,15 @@ namespace CollectComponentEditor.Editor
             CollectObjects();
         }
 
-        private ListView _listView;
-
         private void CollectObjects()
         {
             var root = rootVisualElement;
 
-            if (_listView != null)
+            foreach (var view in _componentViewList)
             {
-                root.Remove(_listView);
-                _listView = null;
+                root.Remove(view);
             }
+            _componentViewList.Clear();
 
             var script = ((_objectField.value as MonoScript));
             if (script == null)
@@ -66,29 +68,23 @@ namespace CollectComponentEditor.Editor
 
             var type = script.GetClass();
             
-            _listView = new ListView();
 
             var targets = FindObjectsOfType(type).ToList();
             targets.Sort((lhs, rhs) => String.Compare(lhs.name, rhs.name, StringComparison.Ordinal));
 
             _statLabel.text = $"total: {targets.Count}";
 
-            _listView.itemsSource = targets;
-            _listView.makeItem = () =>
+            foreach (var targetComponent in targets)
             {
                 var box = new VisualElement();
-                box.Add(new Label());
-                box.Add(new InspectorElement());
-                return box;
-            };
-            _listView.bindItem = (VisualElement element, int index) =>
-            {
-                (element.ElementAt(0) as Label).text = targets[index].name;
-                (element.ElementAt(1) as InspectorElement).Bind(new SerializedObject(targets[index]));
-            };
-
-            _listView.fixedItemHeight = 100;
-            root.Add(_listView);
+                var label = new Label() { text = targetComponent.name };
+                label.style.marginTop = 20;
+                box.Add(label);
+                box.Add(new InspectorElement(new SerializedObject(targetComponent)));
+                
+                root.Add(box);
+                _componentViewList.Add(root);
+            }
         }
     }
 }
