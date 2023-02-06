@@ -1,4 +1,4 @@
-﻿# CollectComponentEditor
+# CollectComponentEditor
 
 シーン上に配置されている、指定したMonoBehaviourコンポーネントの一覧を取得できるエディタ拡張
 
@@ -8,4 +8,4 @@
 2. Scriptに、MonoBehaviour継承クラスを定義したスクリプトファイルを選択する
 3. Updateボタンを押す
 
-![](Docs\imgs\image01.png)
+![](https://github.com/ai2playgame/CollectComponentEditor/blob/main/Docs/imgs/image01.png)
